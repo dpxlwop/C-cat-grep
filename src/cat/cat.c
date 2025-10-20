@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+//#include <stdlib.h> 
+#include <string.h> 
+#include <unistd.h> //для getopt
 #include "cat.h"
 
 #define MAX_ARGS 7
@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
     }
 
     int rez = 0;
-    while ((rez = getopt(argc, argv, "bensta")) != -1) {
+    while ((rez = getopt(argc, argv, "bensta")) != -1) {    //getopt парсит флаги из argv
         switch (rez) {
             case 'b':  // нумеровать непустые строки
                 flag_list[flag_counter++] = 1;
@@ -139,10 +139,10 @@ int file_proccess(const char* filename, int* flags) {
                 print_with_line_numbers(string, &line_number);
             }else
                 printf("%6d\t", line_number++);
-        if (flag_t){
+        }if (flag_t){
             replace_tab(string);
         }
-        } else {    //ecли нет флагов нумерации то выводим строку
+        else {    //ecли нет флагов нумерации то выводим строку
             printf("%s", string);
         }
         if (flag_e) {           //отображать $ в конце каждой строки
