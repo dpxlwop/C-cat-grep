@@ -1,5 +1,4 @@
 #include <stdio.h>
-// #include <stdlib.h> я хз, не помню для чего ее добавлял...
 #include <string.h>
 #include <unistd.h>  //для getopt
 
