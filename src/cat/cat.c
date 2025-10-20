@@ -1,11 +1,22 @@
+#include "cat.h"
+
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>  //для getopt
-
-#include "cat.h"
 
 #define MAX_ARGS 7
 #define MAX_LINE_LENGTH 1024
+
+struct option long_options[] = {
+    // прописываем зависимость длинных флагов к коротким
+    {"number-nonblank", no_argument, 0, 'b'},
+    {"E", no_argument, 0, 'e'},
+    {"number", no_argument, 0, 'n'},
+    {"squeeze-blank", no_argument, 0, 's'},
+    {"T", no_argument, 0, 't'},
+    {"all", no_argument, 0, 'a'},
+    {0, 0, 0, 0}  // требуется для getopt_long
+};
 
 int main(int argc, char** argv) {
     int flag_counter = 0, deleted_flags = 0;
@@ -17,7 +28,9 @@ int main(int argc, char** argv) {
     }
 
     int rez = 0;
-    while ((rez = getopt(argc, argv, "bensta")) != -1) {  // getopt парсит флаги из argv
+    int option_index;  // индекс выбранной опции
+    while ((rez = getopt_long(argc, argv, "bensta", long_options, &option_index)) !=
+           -1) {  // getopt парсит флаги из argv
         switch (rez) {
             case 'b':  // нумеровать непустые строки
                 flag_list[flag_counter++] = 1;
@@ -149,7 +162,7 @@ int file_proccess(const char* filename, int* flags) {
         }
         if (flag_t) {
             replace_tab(string);
-        } else {  // ecли нет флагов нумерации то выводим строку
+        } else if (!flag_b && !flag_n) {  // ecли нет флагов нумерации то выводим строку
             printf("%s", string);
         }
         if (flag_e) {  // отображать $ в конце каждой строки
