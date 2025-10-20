@@ -135,10 +135,10 @@ int file_proccess(const char* filename, int* flags) {
         } else if (flag_n) {    //нумеровать все строки
             print_with_line_numbers(string, &line_number);
             printf("\n");
-        } else {
-            printf("%s\n", string);
+        } else {    //ecли нет флагов нумерации то выводим строку
+            printf("%s", string);
         }
-        if (flag_e) {           //отображать $ в конце каждой строки(в рот шатал)
+        if (flag_e) {           //отображать $ в конце каждой строки
             printf("$\n");
         }
         if (flag_t) {       //отображать \t как ^I (и это тоже)
