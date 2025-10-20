@@ -19,7 +19,7 @@ struct option long_options[] = {
 };
 
 int main(int argc, char** argv) {
-    int flag_counter = 0, deleted_flags = 0;
+    int flag_counter = 0;
     int flag_list[MAX_ARGS] = {0};
 
     if (argc < 2) {
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    normalize_flags(flag_list, flag_counter, &deleted_flags);
+    normalize_flags(flag_list, flag_counter);
     //optind указывает на первый аргумент после флагов
     for (int i = optind; i < argc; i++) {
         if (file_proccess(argv[i], flag_list) != 0) return 1;
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void normalize_flags(int* flags, int count, int* deleted_flags) {
+void normalize_flags(int* flags, int count) {
     int has_a = 0, has_b = 0, has_n = 0;
 
     for (int i = 0; i < count; ++i) {
@@ -80,7 +80,6 @@ void normalize_flags(int* flags, int count, int* deleted_flags) {
             if (flags[i] == 2 || flags[i] == 5) {
                 for (int j = i; j < count - 1; ++j) flags[j] = flags[j + 1];
                 count--;
-                (*deleted_flags)++;
             } else
                 i++;
         }
@@ -92,7 +91,6 @@ void normalize_flags(int* flags, int count, int* deleted_flags) {
             if (flags[i] == 3) {
                 for (int j = i; j < count - 1; ++j) flags[j] = flags[j + 1];
                 count--;
-                (*deleted_flags)++;
             } else
                 i++;
         }
