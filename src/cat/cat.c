@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
     }
 
     normalize_flags(flag_list, flag_counter, &deleted_flags);
-
+    //optind указывает на первый аргумент после флагов
     for (int i = optind; i < argc; i++) {
         if (file_proccess(argv[i], flag_list) != 0) return 1;
     }
