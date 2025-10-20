@@ -127,30 +127,28 @@ int file_proccess(const char* filename, int* flags) {
         //обработка флагов
         if (flag_b) {       //нумеровать непустые строки
             if (!is_empty_line) {
+                if(!flag_t){   //если нет флага t
                 print_with_line_numbers(string, &line_number);
-                printf("\n");
+                } else {
+                    printf("%6d\t", line_number++);
+                }
             } else {
-                printf("\n");
             }
         } else if (flag_n) {    //нумеровать все строки
-            print_with_line_numbers(string, &line_number);
-            printf("\n");
+            if (!flag_t){   //если нет флага t
+                print_with_line_numbers(string, &line_number);
+            }else
+                printf("%6d\t", line_number++);
+        if (flag_t){
+            replace_tab(string);
+        }
         } else {    //ecли нет флагов нумерации то выводим строку
             printf("%s", string);
         }
         if (flag_e) {           //отображать $ в конце каждой строки
-            printf("$\n");
+            printf("$");
         }
-        if (flag_t) {       //отображать \t как ^I (и это тоже)
-            for (char* p = string; *p != '\0'; p++) {
-                if (*p == '\t')
-                    printf("^I");
-                else
-                    putchar(*p);
-            }
-            printf("\n");
-        }
-
+        printf("\n");
         strcpy(prev_line, string);  //копируем предыдущую строку
     }
 
@@ -160,4 +158,14 @@ int file_proccess(const char* filename, int* flags) {
 
 void print_with_line_numbers(const char* string, int* line_number) {
     printf("%6d\t%s", (*line_number)++, string);
+}
+
+void replace_tab(char* string) {
+    for (char* p = string; *p != '\0'; p++) {
+        if (*p == '\t') {
+            printf("^I");
+        } else {
+            putchar(*p);
+        }
+    }
 }
