@@ -1,7 +1,8 @@
 #include <stdio.h>
-//#include <stdlib.h> 
-#include <string.h> 
-#include <unistd.h> //для getopt
+// #include <stdlib.h> я хз, не помню для чего ее добавлял...
+#include <string.h>
+#include <unistd.h>  //для getopt
+
 #include "cat.h"
 
 #define MAX_ARGS 7
@@ -17,7 +18,7 @@ int main(int argc, char** argv) {
     }
 
     int rez = 0;
-    while ((rez = getopt(argc, argv, "bensta")) != -1) {    //getopt парсит флаги из argv
+    while ((rez = getopt(argc, argv, "bensta")) != -1) {  // getopt парсит флаги из argv
         switch (rez) {
             case 'b':  // нумеровать непустые строки
                 flag_list[flag_counter++] = 1;
@@ -46,8 +47,7 @@ int main(int argc, char** argv) {
     normalize_flags(flag_list, flag_counter, &deleted_flags);
 
     for (int i = optind; i < argc; i++) {
-        if (file_proccess(argv[i], flag_list) != 0)
-            return 1;
+        if (file_proccess(argv[i], flag_list) != 0) return 1;
     }
 
     return 0;
@@ -66,8 +66,7 @@ void normalize_flags(int* flags, int count, int* deleted_flags) {
     if (has_a) {
         for (int i = 0; i < count;) {
             if (flags[i] == 2 || flags[i] == 5) {
-                for (int j = i; j < count - 1; ++j)
-                    flags[j] = flags[j + 1];
+                for (int j = i; j < count - 1; ++j) flags[j] = flags[j + 1];
                 count--;
                 (*deleted_flags)++;
             } else
@@ -79,8 +78,7 @@ void normalize_flags(int* flags, int count, int* deleted_flags) {
     if (has_b && has_n) {
         for (int i = 0; i < count;) {
             if (flags[i] == 3) {
-                for (int j = i; j < count - 1; ++j)
-                    flags[j] = flags[j + 1];
+                for (int j = i; j < count - 1; ++j) flags[j] = flags[j + 1];
                 count--;
                 (*deleted_flags)++;
             } else
@@ -100,11 +98,21 @@ int file_proccess(const char* filename, int* flags) {
     // переменные флагов
     for (int i = 0; i < MAX_ARGS; i++) {  // переносим флаги из списка в переменные
         switch (flags[i]) {
-            case 1: flag_b = 1; break;
-            case 2: flag_e = 1; break;
-            case 3: flag_n = 1; break;
-            case 4: flag_s = 1; break;
-            case 5: flag_t = 1; break;
+            case 1:
+                flag_b = 1;
+                break;
+            case 2:
+                flag_e = 1;
+                break;
+            case 3:
+                flag_n = 1;
+                break;
+            case 4:
+                flag_s = 1;
+                break;
+            case 5:
+                flag_t = 1;
+                break;
             case 6:  // -a = -e и -t
                 flag_e = 1;
                 flag_t = 1;
@@ -120,36 +128,36 @@ int file_proccess(const char* filename, int* flags) {
         // убираем символ новой строки
         string[strcspn(string, "\n")] = '\0';  // заменяет \n на \0
         // strcspn ищет первое вхождение элемента
-        int is_empty_line = (strcmp(string, "\0") == 0);    //пустая ли строка
+        int is_empty_line = (strcmp(string, "\0") == 0);  // пустая ли строка
         if (flag_s && is_empty_line && strcmp(prev_line, "\0") == 0) {
             continue;
-        }//скип пустой строки
-        //обработка флагов
-        if (flag_b) {       //нумеровать непустые строки
+        }  // скип пустой строки
+        // обработка флагов
+        if (flag_b) {  // нумеровать непустые строки
             if (!is_empty_line) {
-                if(!flag_t){   //если нет флага t
-                print_with_line_numbers(string, &line_number);
+                if (!flag_t) {  // если нет флага t
+                    print_with_line_numbers(string, &line_number);
                 } else {
                     printf("%6d\t", line_number++);
                 }
             } else {
             }
-        } else if (flag_n) {    //нумеровать все строки
-            if (!flag_t){   //если нет флага t
+        } else if (flag_n) {  // нумеровать все строки
+            if (!flag_t) {    // если нет флага t
                 print_with_line_numbers(string, &line_number);
-            }else
+            } else
                 printf("%6d\t", line_number++);
-        }if (flag_t){
-            replace_tab(string);
         }
-        else {    //ecли нет флагов нумерации то выводим строку
+        if (flag_t) {
+            replace_tab(string);
+        } else {  // ecли нет флагов нумерации то выводим строку
             printf("%s", string);
         }
-        if (flag_e) {           //отображать $ в конце каждой строки
+        if (flag_e) {  // отображать $ в конце каждой строки
             printf("$");
         }
         printf("\n");
-        strcpy(prev_line, string);  //копируем предыдущую строку
+        strcpy(prev_line, string);  // копируем предыдущую строку
     }
 
     fclose(file);
