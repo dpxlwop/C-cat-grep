@@ -7,22 +7,24 @@
 #define MAX_ARGS 10
 #define MAX_LINE_LENGTH 1024
 
-// максимально сырой, вывод работает через очко, но ищет все корректно
-
 // если есть -c или -l то -n игнорируюется.
 
 int main(int argc, char** argv) {
-    int ignore_case = 0, invert_match = 0, print_names_only = 0, print_counter_only = 0,
+    int ignore_case = 0, flag_e = 0, invert_match = 0, print_names_only = 0, print_counter_only = 0,
         show_line_numbers = 0;
     char result[MAX_LINE_LENGTH];
+    char e_arg[MAX_LINE_LENGTH];
     if (argc < 2) {
-        printf("Usage: %s <options> <pattern> <file1> [file2] ...\n", argv[0]);
+        fprintf(stderr, "Usage: %s <options> <pattern> <file1> [file2] ...\n", argv[0]);
         return 1;
     }
     int rez;
-    while ((rez = getopt(argc, argv, "eivcln")) != -1) {
+
+    while ((rez = getopt(argc, argv, "e:ivcln")) != -1) {
         switch (rez) {
             case 'e':  // шаблон
+                flag_e = 1;
+                strcpy(e_arg, optarg);
                 break;
             case 'i':  // игнор регистра
                 ignore_case = 1;
@@ -40,27 +42,32 @@ int main(int argc, char** argv) {
                 show_line_numbers = 1;
                 break;
             case '?':
+                fprintf(stderr, "Unknown option '%c'\n", optopt);
                 return 1;
         }
     }
 
-    int count_matching_str, line_number = 0;
-    for (int i = optind + 1; i < argc; i++) {
-        count_matching_str = 0;
+    for (int i = optind; i < argc; i++) {
+        int count_matching_str = 0, line_number = 0;
         FILE* file = fopen(argv[i], "r");
         if (!file) {
-            printf("File %s does not exists.\n", argv[i]);
+            fprintf(stderr, "File %s does not exists.\n", argv[i]);
             return 1;
         }
         char line[MAX_LINE_LENGTH];
         while (fgets(line, sizeof(line), file) != NULL) {  // читаем строку
             line_number++;
-            search_in_line(line, argv[optind], ignore_case, invert_match, result);  // ищем в ней шаблон
+            if (flag_e) {
+                search_in_line(line, e_arg, ignore_case, invert_match, result);  // ищем в ней шаблон из -e
+            } else {
+                search_in_line(line, argv[optind], ignore_case, invert_match,
+                               result);  // ищем в ней шаблон из аргументов
+            }
             if (result[0] != '\0') {  // если нашли, то добавляем счетчик совпадений
                 count_matching_str++;
                 if (print_counter_only == 0 && print_names_only == 0) {  // проверка на флаги -c и -l
-                    if (show_line_numbers) printf("%d ", line_number);  // если нужно печать номер строки
-                    printf("%s", line);  // выводим найденную строку
+                    if (show_line_numbers) printf("%d ", line_number);   // если нужно печать номер строки
+                    printf("%s", line);                                  // выводим найденную строку
                 }
             }
         }
