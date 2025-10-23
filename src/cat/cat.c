@@ -11,7 +11,6 @@ struct option long_options[] = {
     {"number-nonblank", no_argument, 0, 'b'},
     {"number", no_argument, 0, 'n'},
     {"squeeze-blank", no_argument, 0, 's'},
-    {"all", no_argument, 0, 'a'},
     {0, 0, 0, 0}  // требуется для getopt_long
 };
 
@@ -126,7 +125,7 @@ int file_proccess(const char *filename, int *flags, int flag_count) {
     while (fgets(string, MAX_LINE_LENGTH, file) != NULL) {
         // убираем символ новой строки
         string[strcspn(string, "\n")] = '\0';     // заменяет \n на \0
-        int is_empty_line = (string[0] == '\0');  // пустая ли строка
+        int is_empty_line = (string[0] == '\n');  // пустая ли строка
 
         if (flag_s) {
             if (is_empty_line) {
@@ -146,7 +145,6 @@ int file_proccess(const char *filename, int *flags, int flag_count) {
         } else if (!flag_b && !flag_n && !flag_t) {
             replace_symbols(string, flag_v);
         }
-
         if (flag_e) printf("$");
         printf("\n");
     }
