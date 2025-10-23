@@ -124,7 +124,7 @@ int file_proccess(const char *filename, int *flags, int flag_count) {
 
     while (fgets(string, MAX_LINE_LENGTH, file) != NULL) {
         // убираем символ новой строки
-        string[strcspn(string, "\n")] = '\0';     // заменяет \n на \0
+        //string[strcspn(string, "\n")] = '\0';     // заменяет \n на \0
         int is_empty_line = (string[0] == '\n');  // пустая ли строка
 
         if (flag_s) {
@@ -136,16 +136,22 @@ int file_proccess(const char *filename, int *flags, int flag_count) {
             }
         }
         //-t -b conflict double output
-        if (flag_t && !flag_b && !flag_n) replace_symbols(string, flag_v);
+        if (flag_t && !flag_b && !flag_n) replace_symbols(string, flag_v, flag_t);
 
         if (flag_b && !is_empty_line) {
             print_with_line_numbers(string, &line_number, flag_t, flag_v);
         } else if (flag_n && !flag_b) {
             print_with_line_numbers(string, &line_number, flag_t, flag_v);
         } else if (!flag_b && !flag_n && !flag_t) {
-            replace_symbols(string, flag_v);
+            replace_symbols(string, flag_v, flag_t);
         }
-        if (flag_e) printf("$");
+        if (flag_e)
+            if(is_empty_line){
+                if (flag_b) printf("      \t$");
+                else printf("$");
+            }else if (flag_n) printf("$");
+            else printf("$");
+        
         printf("\n");
     }
 
@@ -156,14 +162,14 @@ int file_proccess(const char *filename, int *flags, int flag_count) {
 void print_with_line_numbers(char *string, int *line_number, int flag_t, int flag_v) {
     if (flag_t) {
         printf("%6d\t", (*line_number)++);
-        replace_symbols(string, flag_v);
+        replace_symbols(string, flag_v, flag_t);
     } else
-        printf("%6d\t", (*line_number)++), replace_symbols(string, flag_v);
+        printf("%6d\t", (*line_number)++), replace_symbols(string, flag_v, flag_t);
 }
 
-void replace_symbols(char *string, int flag_v) {
-    for (unsigned char *p = (unsigned char *)string; *p != '\0'; p++) {
-        if (*p == '\t') {
+void replace_symbols(char *string, int flag_v, int flag_t) {
+    for (unsigned char *p = (unsigned char *)string; *p != '\n' && *p != EOF && *p != '\0'; p++) {
+        if (*p == '\t' && flag_t) {
             printf("^I");
         } else if (flag_v) {
             // отображаем непечатаемые символы
