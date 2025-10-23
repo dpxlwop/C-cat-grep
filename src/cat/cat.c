@@ -168,7 +168,8 @@ void print_with_line_numbers(char *string, int *line_number, int flag_t, int fla
 }
 
 void replace_symbols(char *string, int flag_v, int flag_t) {
-    for (unsigned char *p = (unsigned char *)string; *p != '\n' && *p != EOF && *p != '\0'; p++) {
+    //for (unsigned char *p = (unsigned char *)string; *p != '\n' && *p != EOF && *p != '\0'; p++) {
+    for (unsigned char *p = (unsigned char *)string; *p != '\n'; p++) {
         if (*p == '\t' && flag_t) {
             printf("^I");
         } else if (flag_v) {
