@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 
     int rez = 0;
     int option_index;  // индекс выбранной опции
-    while ((rez = getopt_long(argc, argv, "benstaET", long_options, &option_index)) !=
+    while ((rez = getopt_long(argc, argv, "benstvET", long_options, &option_index)) !=
            -1) {  // getopt парсит флаги из argv
         switch (rez) {
             case 'b':  // нумеровать непустые строки
@@ -48,12 +48,12 @@ int main(int argc, char **argv) {
             case 'T':
                 flag_list[flag_counter++] = 5;
                 break;
-            case 'a':  // = -e и -t
+            case 'v':  //отображать скрытые символы
                 flag_list[flag_counter++] = 6;
                 break;
             default:
                 fprintf(stderr, "Unknown option '%c'\n", optopt);
-                break;
+                return 1;
         }
     }
 
@@ -66,23 +66,11 @@ int main(int argc, char **argv) {
 }
 
 int normalize_flags(int *flags, int count) {
-    int has_a = 0, has_b = 0, has_n = 0;
+    int has_b = 0, has_n = 0;
 
     for (int i = 0; i < count; ++i) {
-        if (flags[i] == 6) has_a = 1;
         if (flags[i] == 1) has_b = 1;
         if (flags[i] == 3) has_n = 1;
-    }
-
-    // Если есть '-a', удалить '-e' и '-t'
-    if (has_a) {
-        for (int i = 0; i < count;) {
-            if (flags[i] == 2 || flags[i] == 5) {
-                for (int j = i; j < count - 1; ++j) flags[j] = flags[j + 1];
-                count--;
-            } else
-                i++;
-        }
     }
 
     // '-b' приоритетнее '-n'
@@ -125,10 +113,6 @@ int file_proccess(const char *filename, int *flags, int flag_count) {
             case 5:
                 flag_t = 1;
                 break;
-            case 6:  // -a = -e и -t
-                flag_e = 1;
-                flag_t = 1;
-                break;
         }
     }
 
@@ -149,13 +133,13 @@ int file_proccess(const char *filename, int *flags, int flag_count) {
                 empty_streak = 0;
             }
         }
-
-        if (flag_t) replace_tab(string);
+            //-t -b conflict double output
+        if (flag_t && !flag_b && !flag_n) replace_tab(string);
 
         if (flag_b && !is_empty_line) {
-            print_with_line_numbers(string, &line_number);
+            print_with_line_numbers(string, &line_number, flag_t);
         } else if (flag_n && !flag_b) {
-            print_with_line_numbers(string, &line_number);
+            print_with_line_numbers(string, &line_number, flag_t);
         } else if (!flag_b && !flag_n && !flag_t) {
             printf("%s", string);
         }
@@ -168,16 +152,20 @@ int file_proccess(const char *filename, int *flags, int flag_count) {
     return 0;
 }
 
-void print_with_line_numbers(const char *string, int *line_number) {
-    printf("%6d\t%s", (*line_number)++, string);
+void print_with_line_numbers(char *string, int *line_number, int flag_t) {
+    if (flag_t) {
+        printf("%6d\t", (*line_number)++);
+        replace_tab(string);
+    }else
+        printf("%6d\t%s", (*line_number)++, string);
 }
 
-void replace_tab(char *string) {
+void replace_symbols(char *string) {
     for (char *p = string; *p != '\0'; p++) {
         if (*p == '\t') {
             printf("^I");
+        }
         } else {
             putchar(*p);
         }
     }
-}
