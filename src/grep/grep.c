@@ -46,7 +46,10 @@ int main(int argc, char** argv) {
                 return 1;
         }
     }
-
+    int pattern_index = -1; // индекс шаблона в argv
+    if (!flag_e)
+        pattern_index = optind++;          // первый аргумент — шаблон
+            
     for (int i = optind; i < argc; i++) {
         int count_matching_str = 0, line_number = 0;
         FILE* file = fopen(argv[i], "r");
@@ -60,7 +63,7 @@ int main(int argc, char** argv) {
             if (flag_e) {
                 search_in_line(line, e_arg, ignore_case, invert_match, result);  // ищем в ней шаблон из -e
             } else {
-                search_in_line(line, argv[optind], ignore_case, invert_match,
+                search_in_line(line, argv[pattern_index], ignore_case, invert_match,
                                result);  // ищем в ней шаблон из аргументов
             }
             if (result[0] != '\0') {  // если нашли, то добавляем счетчик совпадений

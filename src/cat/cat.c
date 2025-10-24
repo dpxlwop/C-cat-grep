@@ -145,13 +145,18 @@ int file_proccess(const char *filename, int *flags, int flag_count) {
         } else if (!flag_b && !flag_n && !flag_t) {
             replace_symbols(string, flag_v, flag_t);
         }
-        if (flag_e)
-            if(is_empty_line){
-                if (flag_b) printf("      \t$");
-                else printf("$");
-            }else if (flag_n) printf("$");
-            else printf("$");
-        
+        if (flag_e) {
+            printf("$");
+            //if (is_empty_line) {
+            //    if (flag_b) {
+            //        printf("      \t$");
+            //    } else {
+            //    printf("$");
+            //    }   
+            //} else {
+            //    printf("$");
+            //}
+        }
         printf("\n");
     }
 
