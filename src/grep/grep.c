@@ -47,6 +47,9 @@ int main(int argc, char** argv) {
                 return 1;
         }
     }
+    if (flag_c || flag_l) {
+        flag_n = 0;
+    }
     for (int i = optind; i < argc; i++) {
         int count_matching_str = 0, line_number = 0;
         FILE* file = fopen(argv[i], "r");
