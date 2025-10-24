@@ -4,16 +4,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_ARGS 10
 #define MAX_LINE_LENGTH 1024
 
 // если есть -c или -l то -n игнорируюется.
 
 int main(int argc, char** argv) {
-    int ignore_case = 0, flag_e = 0, invert_match = 0, print_names_only = 0, print_counter_only = 0,
-        show_line_numbers = 0;
+    int flag_i = 0, flag_e = 0, flag_v = 0, flag_l = 0, flag_c = 0, flag_n = 0;
     char result[MAX_LINE_LENGTH];
-    char e_arg[MAX_LINE_LENGTH];
+    char e_arg[MAX_LINE_LENGTH];    //заменить на двумерный массив malloc
+    int earg_counter = 0;
+
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <options> <pattern> <file1> [file2] ...\n", argv[0]);
         return 1;
@@ -24,32 +24,29 @@ int main(int argc, char** argv) {
         switch (rez) {
             case 'e':  // шаблон
                 flag_e = 1;
-                strcpy(e_arg, optarg);
+                //расширение через realloc
+                strcpy(e_arg[earg_counter++], optarg);
                 break;
             case 'i':  // игнор регистра
-                ignore_case = 1;
+                flag_i = 1;
                 break;
             case 'v':  // инвертировать поиск
-                invert_match = 1;
+                flag_v = 1;
                 break;
             case 'c':  // количество совпадающих строк
-                print_counter_only = 1;
+                flag_c = 1;
                 break;
             case 'l':  // только имена файлов с совпадениями
-                print_names_only = 1;
+                flag_l = 1;
                 break;
             case 'n':  // номер строки
-                show_line_numbers = 1;
+                flag_n = 1;
                 break;
             case '?':
                 fprintf(stderr, "Unknown option '%c'\n", optopt);
                 return 1;
         }
     }
-    int pattern_index = -1; // индекс шаблона в argv
-    if (!flag_e)
-        pattern_index = optind++;          // первый аргумент — шаблон
-            
     for (int i = optind; i < argc; i++) {
         int count_matching_str = 0, line_number = 0;
         FILE* file = fopen(argv[i], "r");
@@ -58,31 +55,39 @@ int main(int argc, char** argv) {
             return 1;
         }
         char line[MAX_LINE_LENGTH];
-        while (fgets(line, sizeof(line), file) != NULL) {  // читаем строку
+        while (fgets(line, sizeof(line), file) != NULL) {
             line_number++;
-            if (flag_e) {
-                search_in_line(line, e_arg, ignore_case, invert_match, result);  // ищем в ней шаблон из -e
-            } else {
-                search_in_line(line, argv[pattern_index], ignore_case, invert_match,
-                               result);  // ищем в ней шаблон из аргументов
+            int match = 0;
+            char result[MAX_LINE_LENGTH] = {0};
+            if (flag_e) {       //если есть -e
+                for (int k = 0; k < earg_counter; k++) {
+                    search_in_line(line, e_arg[k], flag_i, flag_v, result);
+                    if (result[0] != '\0') {    //смотрим по всем шаблонам, если хотя бы один совпадет - выходим из цикла
+                        match = 1;
+                        k = earg_counter;
+                    }
+                }
+            } else {    //обычный поиск
+                search_in_line(line, argv[pattern_index], flag_i, flag_v, result);
+                if (result[0] != '\0')
+                    match = 1;
             }
-            if (result[0] != '\0') {  // если нашли, то добавляем счетчик совпадений
+            if (match) {
                 count_matching_str++;
-                if (print_counter_only == 0 && print_names_only == 0) {  // проверка на флаги -c и -l
-                    if (show_line_numbers) printf("%d ", line_number);   // если нужно печать номер строки
-                    printf("%s", line);                                  // выводим найденную строку
+                if (!flag_c && !flag_l) {   //если совпадение, то вывод по флагам
+                    if (flag_n) printf("%d:", line_number);
+                    printf("%s", line);
                 }
             }
         }
-        if (print_counter_only == 1 && count_matching_str > 0) {  // вывод если флаги -c или -l
-            printf("%s: %d\n", argv[i], count_matching_str);
-        } else if (print_names_only == 1 && count_matching_str > 0) {
+        if (flag_c)     //вывод чисто количества строк
+            printf("%s:%d\n", argv[i], count_matching_str);
+        if (flag_l && count_matching_str > 0)       //вывод только имен файлов
             printf("%s\n", argv[i]);
-        }
         fclose(file);
     }
     return 0;
-}
+    }
 
 void search_in_line(const char* line, const char* pattern, int ignore_case, int invert_match, char* result) {
     int match = 0;
