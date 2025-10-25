@@ -12,10 +12,8 @@
 int main(int argc, char** argv) {
     flags flag_container = {0};
     int e_args_counter = 0;
-    //char e_arg[MAX_LINE_LENGTH];    //заменить на двумерный массив malloc
     char **e_args = (char **)malloc(e_args_counter * sizeof(char *));
     if (e_args == NULL) {
-        // Обработка ошибки выделения памяти
         return 1;
     }
     if (argc < 2) {
