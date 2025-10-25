@@ -1,17 +1,16 @@
-CFLAGS = -Wall -Werror -Wextra
-BUILD_DIR = ../build
+CFLAGS = -Wall -Werror -Wextra -std=c11
 
-all: cat grep
+all: s21_cat s21_grep
 
-cat: 
-	gcc $(CFLAGS) cat/cat.c -o $(BUILD_DIR)/s21_cat
+s21_cat: 
+	gcc $(CFLAGS) cat/cat.c -o cat/s21_cat
 
-grep: 
-	gcc $(CFLAGS) grep/grep.c -o $(BUILD_DIR)/s21_grep
+s21_grep: 
+	gcc $(CFLAGS) grep/grep.c -o grep/s21_grep
 
 clean:
-	rm -f $(BUILD_DIR)/*
+	rm -f cat/s_21cat grep/s21_grep
 
 rebuild: clean all
 
-.PHONY: all cat grep clean rebuild test_cat test_grep
+.PHONY: all cat grep clean rebuild s21_grep s21_cat

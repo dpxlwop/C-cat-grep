@@ -15,7 +15,7 @@ struct option long_options[] = {
 };
 
 int main(int argc, char** argv) {
-    flags flag_container;
+    flags flag_container={0};
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <options> <file1> [file2] ...\n", argv[0]);
         return 1;
@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
                 break;
             case 'e':  // отображать $ в конце каждой строки
                 flag_container.v = 1;       //включает -v
+                /* FALL THROUGH */
             case 'E':
                 flag_container.e = 1;
                 break;
@@ -41,6 +42,7 @@ int main(int argc, char** argv) {
                 break;
             case 't':  // отображать \t как ^I
                 flag_container.v = 1;       //включает -v
+                 /* FALL THROUGH */
             case 'T':
                 flag_container.t = 1;
                 break;
@@ -101,7 +103,6 @@ void replace_symbols(char *string, int flag_v, int flag_t) {
             putchar(*p);
     }
 }
-
 
 void print_visible_char(unsigned char c) {
     if (c >= 32 && c < 127)   //обычные символы
