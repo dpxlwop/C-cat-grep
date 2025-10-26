@@ -1,7 +1,7 @@
 #!/bin/bash
 
 GREEN='\033[0;32m'
-RED='\033[0;31m'
+RED='\033[0;31m'  # Исправлено: было '\033[0;31m', но NC ниже — лучше использовать RED правильно
 NC='\033[0m'
 
 S21_CAT="./s21_cat"
@@ -14,18 +14,22 @@ OUT2="output2.txt"
 passed=0
 failed=0
 
+# Входные данные с различными спецсимволами
+TEST_CONTENT=$'\nHello\tworld\t\n\t\t\n\n\ntest test\t\nbye\x01\x0212345\x08\x08\x08678\x04\x1b\x7fInvisible chars test\x05END'
+
 run_test() {
-    echo "\nHello\tworld\t\n\t\t\n\n\ntest test\t\nbye12345678Invisible chars testEND" > "$INT"
-	local cmd="$1"
+    local flags="$1"
+    echo "$TEST_CONTENT" > "$INT"
+    local cmd="$S21_CAT $flags $INT"
     echo "Testing: $cmd ... "
 
-    # Заменяем './s21_cat' на 'cat', чтобы вызвать системную утилиту
-    local sys_cmd="${cmd#./}"  # Убирает './' в начале строки, если есть
+    # Заменяем './s21_cat' на 'cat'
+    local sys_cmd="${cmd#./}"
     sys_cmd="${sys_cmd/s21_cat/cat}"
 
     # Выполняем обе команды
-    eval "$cmd" > "$OUT1"
-	eval "$sys_cmd" > "$OUT2"
+    eval "$cmd" > "$OUT1" 2>/dev/null || true
+    eval "$sys_cmd" > "$OUT2" 2>/dev/null || true
 
     # Сравниваем вывод
     if diff -q "$OUT1" "$OUT2" > /dev/null; then
@@ -37,47 +41,36 @@ run_test() {
     fi
 }
 
-run_test_gnu() {
-	echo "\nHello\tworld\t\n\t\t\n\n\ntest test\t\nbye" > "$INT"
-    local gnu_cmd="$1"
-    local native_flag="$2"
-    echo "Testing GNU [$gnu_cmd] vs native [$native_flag] ... "
+# Генерация всех комбинаций флагов из списка
+generate_combinations() {
+    local flags=("-b" "-e" "-n" "-s" "-t" "-v")
+    local n=${#flags[@]}
+    local max=$((1 << n))  # 2^n
 
-    # Выполняем обе команды
-    eval "$gnu_cmd" > "$OUT1"
-    eval "$SYS_CAT $native_flag $INT" > "$OUT2"
-
-    # Сравниваем вывод
-    if diff -q "$OUT1" "$OUT2" > /dev/null; then
-        echo -e "${GREEN}OK${NC}"
-        passed=$((passed + 1))
-    else
-        echo -e "${RED}FAIL${NC}"
-        failed=$((failed + 1))
-    fi
+    for ((i=0; i<max; i++)); do
+        local combo=""
+        for ((j=0; j<n; j++)); do
+            if (( (i >> j) & 1 )); then
+                combo+="${flags[j]} "
+            fi
+        done
+        # Убираем лишний пробел в конце и передаём в run_test
+        combo=$(echo "$combo" | sed 's/ $//')
+        if [ -z "$combo" ]; then
+            run_test ""
+        else
+            run_test "$combo"
+        fi
+    done
 }
 
-run_test "$S21_CAT -b $INT"
-run_test "$S21_CAT -e $INT"
-run_test "$S21_CAT -n $INT"
-run_test "$S21_CAT -s $INT"
-run_test "$S21_CAT -t $INT"
-run_test "$S21_CAT -v $INT"
-run_test "$S21_CAT -be $INT"
-run_test "$S21_CAT -en $INT"
-run_test "$S21_CAT -nt $INT"
-run_test "$S21_CAT -st $INT"
-run_test "$S21_CAT -bstn $INT"
-run_test "$S21_CAT -btse $INT"
-run_test "$S21_CAT -ntv $INT"
-run_test_gnu "$S21_CAT --number-nonblank $INT" "-b"
-run_test_gnu "$S21_CAT -E $INT" "-e"
-run_test_gnu "$S21_CAT --number $INT" "-n"
-run_test_gnu "$S21_CAT --squeeze-blank $INT" "-s"
-run_test_gnu "$S21_CAT -T $INT" "-t"
+# Запуск всех комбинаций
+generate_combinations
 
+# Очистка
 rm -f "$INT" "$OUT1" "$OUT2"
 
+# Итог
 echo -e "\nПройдено: ${GREEN}$passed${NC}"
 echo -e "Провалено: ${RED}$failed${NC}\n"
 

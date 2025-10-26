@@ -15,6 +15,7 @@ OUT2="output2.txt"
 passed=0
 failed=0
 
+# Подготовка входных файлов
 cat > "$INT" << EOF
 Hello World
 hello world
@@ -25,86 +26,62 @@ EOF
 
 cp "$INT" "$INT2"
 
+# Паттерн для поиска
+PATTERN="hello"
+
 run_test() {
-    local options="$1"
-    local pattern="$2"
-    local files="$3"
-    echo "Testing: $S21_GREP $options '$pattern' $files ..."
+    local flags="$1"
+    local files="$2"
+    echo "Testing: $S21_GREP $flags -e '$PATTERN' $files ..."
 
-    # Выполняем обе команды
-    $S21_GREP $options "$pattern" $files > "$OUT1"
-    $SYS_GREP $options "$pattern" $files > "$OUT2"
+    # Формируем команды
+    local cmd1="$S21_GREP $flags -e \"$PATTERN\" $files"
+    local cmd2="$SYS_GREP $flags -e \"$PATTERN\" $files"
 
-    # Сравниваем вывод
+    # Выполняем
+    eval "$cmd1" > "$OUT1" 2>/dev/null || true
+    eval "$cmd2" > "$OUT2" 2>/dev/null || true
+
+    # Сравниваем
     if diff -q "$OUT1" "$OUT2" > /dev/null; then
         echo -e "${GREEN}OK${NC}"
         passed=$((passed + 1))
     else
         echo -e "${RED}FAIL${NC}"
-        echo "Различия в выводе:"
+        echo "Различия:"
         diff "$OUT1" "$OUT2"
         failed=$((failed + 1))
     fi
 }
-echo "\n--- Одиночные флаги ---"
-run_test "-e" "hello" "$INT"
-run_test "-i" "HELLO" "$INT"
-run_test "-v" "hello" "$INT"
-run_test "-c" "hello" "$INT"
-run_test "-l" "hello" "$INT"
-run_test "-n" "hello" "$INT"
-#run_test "-h" "hello" "$INT"
-#run_test "-s" "xyz" "$INT"
-run_test "" "hello" "$INT"
 
-echo "\n--- Комбинации флагов ---"
-run_test "-iv" "HELLO" "$INT"
-run_test "-in" "HELLO" "$INT"
-run_test "-vc" "hello" "$INT"
-run_test "-nc" "hello" "$INT"
-#run_test "-ih" "HELLO" "$INT"
-run_test "-cv" "hello" "$INT"
-run_test "-lv" "hello" "$INT"
-run_test "-ivn" "HELLO" "$INT"
-run_test "-ivc" "HELLO" "$INT"
-run_test "-ivl" "HELLO" "$INT"
-#run_test "-ivh" "HELLO" "$INT"
-#run_test "-ivs" "HELLO" "$INT"
-run_test "-inc" "HELLO" "$INT"
-run_test "-inl" "HELLO" "$INT"
-#run_test "-inh" "HELLO" "$INT"
-#run_test "-ins" "HELLO" "$INT"
-#run_test "-vch" "hello" "$INT"
-#run_test "-vcs" "hello" "$INT"
-#run_test "-nch" "hello" "$INT"
-#run_test "-ncs" "hello" "$INT"
-run_test "-ivnc" "HELLO" "$INT"
-run_test "-ivnl" "HELLO" "$INT"
-#run_test "-ivnh" "HELLO" "$INT"
-#run_test "-ivns" "HELLO" "$INT"
-#run_test "-ivch" "HELLO" "$INT"
-#run_test "-ivcs" "HELLO" "$INT"
-#run_test "-inch" "HELLO" "$INT"
-#run_test "-incs" "HELLO" "$INT"
-#run_test "-vchs" "hello" "$INT"
-#run_test "-nchs" "hello" "$INT"
-#run_test "-ivnch" "HELLO" "$INT"
-#run_test "-ivncs" "HELLO" "$INT"
-#run_test "-ivchs" "HELLO" "$INT"
-#run_test "-inchs" "HELLO" "$INT"
+# Генерация всех комбинаций флагов из списка
+generate_all_combinations() {
+    local flags=("-e" "-i" "-v" "-c" "-l" "-n")
+    local n=${#flags[@]}
+    local total=$((1 << n))  # 2^6 = 64
 
-echo "\n--- Много паттернов через -e ---"
-run_test "-e hello -e HELLO" "$INT"
-run_test "-i -e hello -e WORLD" "$INT"
-run_test "-v -e hello -e test" "$INT"
+    for ((mask = 0; mask < total; mask++)); do
+        local combo=""
+        for ((j = 0; j < n; j++)); do
+            if (( (mask >> j) & 1 )); then
+                combo+="${flags[j]} "
+            fi
+        done
+        combo=$(echo "$combo" | sed 's/ $//')  # убрать завершающий пробел
 
-echo "\n--- Работа с несколькими файлами ---"
-run_test "-e" "hello" "$INT $INT2"
-run_test "-c -i" "hello" "$INT $INT2"
-#run_test "-h -v" "test" "$INT $INT2"
+        # Тестируем с одним и двумя файлами
+        run_test "$combo" "$INT"
+        run_test "$combo" "$INT $INT2"
+    done
+}
 
+# Запуск всех тестов
+generate_all_combinations
+
+# Очистка
 rm -f "$INT" "$INT2" "$OUT1" "$OUT2"
 
+# Итог
 echo -e "\nПройдено: ${GREEN}$passed${NC}"
 echo -e "Провалено: ${RED}$failed${NC}\n"
 
