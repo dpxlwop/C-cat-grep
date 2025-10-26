@@ -1,128 +1,504 @@
 FAIL
 Command: ./s21_grep -i -o -e 'hello' input.txt
 Expected: grep -i -o -e 'hello' input.txt
+Diff output:
+0a1
+> Hello
+2,3c3
+< hello
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -o -e 'hello' input.txt input2.txt
 Expected: grep -i -o -e 'hello' input.txt input2.txt
+Diff output:
+0a1
+> input.txt:Hello
+2,3c3,4
+< input.txt:hello
+< input.txt:hello
+---
+> input.txt:HELLO
+> input2.txt:Hello
+5,6c6
+< input2.txt:hello
+< input2.txt:hello
+---
+> input2.txt:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -o -f patterns.txt input.txt
 Expected: grep -i -o -f patterns.txt input.txt
+Diff output:
+0a1
+> Hello
+2d2
+< hello
+4c4
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -o -f patterns.txt input.txt input2.txt
 Expected: grep -i -o -f patterns.txt input.txt input2.txt
+Diff output:
+0a1
+> input.txt:Hello
+2d2
+< input.txt:hello
+4c4,5
+< input.txt:hello
+---
+> input.txt:HELLO
+> input2.txt:Hello
+6d6
+< input2.txt:hello
+8c8
+< input2.txt:hello
+---
+> input2.txt:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -o -e 'hello' input.txt
 Expected: grep -i -n -o -e 'hello' input.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+3c3
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -o -e 'hello' input.txt input2.txt
 Expected: grep -i -n -o -e 'hello' input.txt input2.txt
+Diff output:
+1c1
+< input.txt:1:hello
+---
+> input.txt:1:Hello
+3,4c3,4
+< input.txt:4:hello
+< input2.txt:1:hello
+---
+> input.txt:4:HELLO
+> input2.txt:1:Hello
+6c6
+< input2.txt:4:hello
+---
+> input2.txt:4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -o -f patterns.txt input.txt
 Expected: grep -i -n -o -f patterns.txt input.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+4c4
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -o -f patterns.txt input.txt input2.txt
 Expected: grep -i -n -o -f patterns.txt input.txt input2.txt
+Diff output:
+1c1
+< input.txt:1:hello
+---
+> input.txt:1:Hello
+4,5c4,5
+< input.txt:4:hello
+< input2.txt:1:hello
+---
+> input.txt:4:HELLO
+> input2.txt:1:Hello
+8c8
+< input2.txt:4:hello
+---
+> input2.txt:4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -h -o -e 'hello' input.txt
 Expected: grep -i -h -o -e 'hello' input.txt
+Diff output:
+0a1
+> Hello
+2,3c3
+< hello
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -h -o -e 'hello' input.txt input2.txt
 Expected: grep -i -h -o -e 'hello' input.txt input2.txt
+Diff output:
+0a1
+> Hello
+1a3,4
+> HELLO
+> Hello
+3,6c6
+< hello
+< hello
+< hello
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -h -o -f patterns.txt input.txt
 Expected: grep -i -h -o -f patterns.txt input.txt
+Diff output:
+0a1
+> Hello
+2d2
+< hello
+4c4
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -h -o -f patterns.txt input.txt input2.txt
 Expected: grep -i -h -o -f patterns.txt input.txt input2.txt
+Diff output:
+0a1
+> Hello
+2d2
+< hello
+3a4,5
+> HELLO
+> Hello
+5,6d6
+< hello
+< hello
+8c8
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -h -o -e 'hello' input.txt
 Expected: grep -i -n -h -o -e 'hello' input.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+3c3
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -h -o -e 'hello' input.txt input2.txt
 Expected: grep -i -n -h -o -e 'hello' input.txt input2.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+3,4c3,4
+< 4:hello
+< 1:hello
+---
+> 4:HELLO
+> 1:Hello
+6c6
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -h -o -f patterns.txt input.txt
 Expected: grep -i -n -h -o -f patterns.txt input.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+4c4
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -h -o -f patterns.txt input.txt input2.txt
 Expected: grep -i -n -h -o -f patterns.txt input.txt input2.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+4,5c4,5
+< 4:hello
+< 1:hello
+---
+> 4:HELLO
+> 1:Hello
+8c8
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -s -o -e 'hello' input.txt
 Expected: grep -i -s -o -e 'hello' input.txt
+Diff output:
+0a1
+> Hello
+2,3c3
+< hello
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -s -o -e 'hello' input.txt input2.txt
 Expected: grep -i -s -o -e 'hello' input.txt input2.txt
+Diff output:
+0a1
+> input.txt:Hello
+2,3c3,4
+< input.txt:hello
+< input.txt:hello
+---
+> input.txt:HELLO
+> input2.txt:Hello
+5,6c6
+< input2.txt:hello
+< input2.txt:hello
+---
+> input2.txt:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -s -o -f patterns.txt input.txt
 Expected: grep -i -s -o -f patterns.txt input.txt
+Diff output:
+0a1
+> Hello
+2d2
+< hello
+4c4
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -s -o -f patterns.txt input.txt input2.txt
 Expected: grep -i -s -o -f patterns.txt input.txt input2.txt
+Diff output:
+0a1
+> input.txt:Hello
+2d2
+< input.txt:hello
+4c4,5
+< input.txt:hello
+---
+> input.txt:HELLO
+> input2.txt:Hello
+6d6
+< input2.txt:hello
+8c8
+< input2.txt:hello
+---
+> input2.txt:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -s -o -e 'hello' input.txt
 Expected: grep -i -n -s -o -e 'hello' input.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+3c3
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -s -o -e 'hello' input.txt input2.txt
 Expected: grep -i -n -s -o -e 'hello' input.txt input2.txt
+Diff output:
+1c1
+< input.txt:1:hello
+---
+> input.txt:1:Hello
+3,4c3,4
+< input.txt:4:hello
+< input2.txt:1:hello
+---
+> input.txt:4:HELLO
+> input2.txt:1:Hello
+6c6
+< input2.txt:4:hello
+---
+> input2.txt:4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -s -o -f patterns.txt input.txt
 Expected: grep -i -n -s -o -f patterns.txt input.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+4c4
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -s -o -f patterns.txt input.txt input2.txt
 Expected: grep -i -n -s -o -f patterns.txt input.txt input2.txt
+Diff output:
+1c1
+< input.txt:1:hello
+---
+> input.txt:1:Hello
+4,5c4,5
+< input.txt:4:hello
+< input2.txt:1:hello
+---
+> input.txt:4:HELLO
+> input2.txt:1:Hello
+8c8
+< input2.txt:4:hello
+---
+> input2.txt:4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -h -s -o -e 'hello' input.txt
 Expected: grep -i -h -s -o -e 'hello' input.txt
+Diff output:
+0a1
+> Hello
+2,3c3
+< hello
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -h -s -o -e 'hello' input.txt input2.txt
 Expected: grep -i -h -s -o -e 'hello' input.txt input2.txt
+Diff output:
+0a1
+> Hello
+1a3,4
+> HELLO
+> Hello
+3,6c6
+< hello
+< hello
+< hello
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -h -s -o -f patterns.txt input.txt
 Expected: grep -i -h -s -o -f patterns.txt input.txt
+Diff output:
+0a1
+> Hello
+2d2
+< hello
+4c4
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -h -s -o -f patterns.txt input.txt input2.txt
 Expected: grep -i -h -s -o -f patterns.txt input.txt input2.txt
+Diff output:
+0a1
+> Hello
+2d2
+< hello
+3a4,5
+> HELLO
+> Hello
+5,6d6
+< hello
+< hello
+8c8
+< hello
+---
+> HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -h -s -o -e 'hello' input.txt
 Expected: grep -i -n -h -s -o -e 'hello' input.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+3c3
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -h -s -o -e 'hello' input.txt input2.txt
 Expected: grep -i -n -h -s -o -e 'hello' input.txt input2.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+3,4c3,4
+< 4:hello
+< 1:hello
+---
+> 4:HELLO
+> 1:Hello
+6c6
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -h -s -o -f patterns.txt input.txt
 Expected: grep -i -n -h -s -o -f patterns.txt input.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+4c4
+< 4:hello
+---
+> 4:HELLO
 ---
 FAIL
 Command: ./s21_grep -i -n -h -s -o -f patterns.txt input.txt input2.txt
 Expected: grep -i -n -h -s -o -f patterns.txt input.txt input2.txt
+Diff output:
+1c1
+< 1:hello
+---
+> 1:Hello
+4,5c4,5
+< 4:hello
+< 1:hello
+---
+> 4:HELLO
+> 1:Hello
+8c8
+< 4:hello
+---
+> 4:HELLO
 ---

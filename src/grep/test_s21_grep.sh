@@ -46,7 +46,7 @@ run_test() {
     eval "$cmd2" > "$OUT2" 2>/dev/null || true
 
     # Сравниваем
-    if diff -q "$OUT1" "$OUT2" > /dev/null; then
+    if diff -q "$OUT1" "$OUT2"; then
         echo -e "${GREEN}OK${NC}"
         passed=$((passed + 1))
     else
@@ -55,6 +55,8 @@ run_test() {
         echo "FAIL" >> "$LOG_FILE"
         echo "Command: $cmd1" >> "$LOG_FILE"
         echo "Expected: $cmd2" >> "$LOG_FILE"
+        echo "Diff output:"  >> "$LOG_FILE"
+        diff "$OUT1" "$OUT2" >> "$LOG_FILE"
         echo "---" >> "$LOG_FILE"
     fi
 }
@@ -112,7 +114,7 @@ generate_flag_combinations() {
 generate_flag_combinations
 
 # Очистка временных файлов
-rm -f "$INT" "$INT2" "$PATTERN_FILE" "$OUT1" "$OUT2"
+#rm -f "$INT" "$INT2" "$PATTERN_FILE" "$OUT1" "$OUT2"
 
 # Итог
 echo -e "\nПройдено: ${GREEN}$passed${NC}"

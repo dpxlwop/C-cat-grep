@@ -135,12 +135,12 @@ void file_proccess(int argc, char** argv, flags flag_container, char** e_args, i
             char result[MAX_LINE_LENGTH] = {0};
             if (flag_container.e) {  // если есть -e
                 for (int k = 0; k < e_args_counter; k++)
-                    if ((match = search_in_line(line, e_args[k], flag_container.i, result)) == 1){
+                    if ((match = search_in_line(line, e_args[k], flag_container, result)) == 1){
                         strcpy(pattern, e_args[k]);  //копируем строку на случай -o
                         k = e_args_counter;
                     }
             } else{   // обычный поиск
-                match = search_in_line(line, argv[optind], flag_container.i, result);
+                match = search_in_line(line, argv[optind], flag_container, result);
                 strcpy(pattern, argv[optind]);
             }
             if (flag_container.o && match){
@@ -199,14 +199,21 @@ void free_mem(char** e_args, int e_args_counter) {
     free(e_args);
 }
 
-int search_in_line(const char* line, const char* pattern, int ignore_case, char* result) {
+int search_in_line(const char* line, const char* pattern, flags flag_container, char* result) {
     int match = 0;
     result[0] = '\0';  // очищаем результат
-    if (ignore_case) {
+    if (flag_container.i) {
         match = (strcasestr(line, pattern) != NULL);  // ищем строку без учета регистра
     } else {
         match = (strstr(line, pattern) != NULL);  // ищем строку с учетом регистра
     }
-    strcpy(result, line);  // копируем строку
+    
+    if (flag_container.o){
+        int j  = 0, len = strlen(pattern);
+        for (char* i = strcasestr(line, pattern); j < len; j++){
+            result[j] = *i;
+            i++;}
+    } else
+        strcpy(result, line);  // копируем строку
     return match;
 }
