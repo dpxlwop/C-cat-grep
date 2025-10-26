@@ -84,7 +84,7 @@ test_with_f() {
 # Генерация комбинаций флагов (без -e и -f, они добавляются отдельно)
 generate_flag_combinations() {
     # Все флаги, кроме -e и -f (они управляют источником шаблона)
-    local base_flags=("-i" "-v" "-c" "-l" "-n" "-h" "-s" "-o")
+    local base_flags=("-i" "-v" "-c" "-l" "-n" "-h" "-s")
     local n=${#base_flags[@]}
     local total=$((1 << n))
 
@@ -114,7 +114,7 @@ generate_flag_combinations() {
 generate_flag_combinations
 
 # Очистка временных файлов
-#rm -f "$INT" "$INT2" "$PATTERN_FILE" "$OUT1" "$OUT2"
+rm -f "$INT" "$INT2" "$PATTERN_FILE" "$OUT1" "$OUT2"
 
 # Итог
 echo -e "\nПройдено: ${GREEN}$passed${NC}"

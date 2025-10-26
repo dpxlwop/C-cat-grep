@@ -1,5 +1,0 @@
-Hello World
-hello world
-This is a test.
-Another line with HELLO.
-End of file.
