@@ -21,18 +21,11 @@ int main(int argc, char** argv) {
         return 1;
     }
     int rez;
-    while ((rez = getopt(argc, argv, "e:ivclnhs")) != -1) {
+    while ((rez = getopt(argc, argv, "e:ivclnhsof:")) != -1) {
         switch (rez) {
-            case 'e':  // шаблон           -f -o
+            case 'e':  // шаблон
                 flag_container.e = 1;
-                e_args = realloc(e_args, (e_args_counter + 1) * sizeof(char*));
-                e_args[e_args_counter] = realloc(e_args[e_args_counter], MAX_LINE_LENGTH);
-                if (e_args == NULL || e_args[e_args_counter] == NULL) {
-                    free_mem(e_args, e_args_counter);
-                    return 1;
-                }
-                strcpy(e_args[e_args_counter], optarg);
-                e_args_counter++;
+                get_arg_array(flag_container, e_args, &e_args_counter, argv);
                 break;
             case 'i':  // игнор регистра
                 flag_container.i = 1;
@@ -55,6 +48,14 @@ int main(int argc, char** argv) {
             case 's': //не печатать ошибки о файлах
                 flag_container.s = 1;
                 break;
+            case 'f': //файл с шаблонами, по сути -e
+                flag_container.f = optind+1;
+                flag_container.e = 1;   //для простой обработки
+                get_arg_array(flag_container, e_args, &e_args_counter, argv);
+                break;
+            case 'o':   //печатать только совпавшие слова
+                flag_container.o = 1;
+                break;
             case '?':
                 fprintf(stderr, "Unknown option '%c'\n", optopt);
                 free_mem(e_args, e_args_counter);
@@ -67,9 +68,52 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+int get_arg_array(flags flag_container, char** e_args, int* e_args_counter, char** argv) {
+    if (flag_container.f != 0){      //-f
+        char line[MAX_LINE_LENGTH];
+        FILE *file = fopen(optarg, "r");
+        if (!file && !flag_container.s) {
+            fprintf(stderr, "File %s does not exists.\n", argv[flag_container.f]);
+            return 1;
+        }
+        while (fgets(line, sizeof(line), file) != NULL) {          //читаем файл и кидаем все в массив флага -e
+            e_args = realloc(e_args, (*e_args_counter + 1) * sizeof(char*));        //выделение памяти и ошибки 
+            if (e_args == NULL) {
+                free_mem(e_args, *e_args_counter);
+                printf("Error allocating memory\n");
+                return 1;
+            }
+            e_args[*e_args_counter] = realloc(e_args[*e_args_counter], MAX_LINE_LENGTH);
+            if (e_args[*e_args_counter] == NULL) {
+                printf("Error allocating memory\n");
+                free_mem(e_args, *e_args_counter);
+                return 1;
+            }
+            line[strcspn(line, "\n")] = '\0';    //\n = \0
+            strcpy(e_args[*e_args_counter], line);
+            (*e_args_counter)++;
+        }
+    } else if (flag_container.e){
+        e_args = realloc(e_args, (*e_args_counter + 1) * sizeof(char*));    //выделение памяти и ошибки
+        if (e_args == NULL) {
+            free_mem(e_args, *e_args_counter);
+            return 1;
+            }
+        e_args[*e_args_counter] = realloc(e_args[*e_args_counter], MAX_LINE_LENGTH);
+        if (e_args[*e_args_counter] == NULL) {
+            free_mem(e_args, *e_args_counter);
+            return 1;
+            }
+        strcpy(e_args[*e_args_counter], optarg);
+        (*e_args_counter)++;
+    }
+    return 0;
+}
+
 void file_proccess(int argc, char** argv, flags flag_container, char** e_args, int e_args_counter) {
-    int file_index;
-    if (flag_container.e)
+    int file_index;     //счиьаем индекс файла
+    char pattern[MAX_LINE_LENGTH];
+    if (flag_container.e || flag_container.f)
         file_index = optind;
     else
         file_index = optind + 1;
@@ -80,7 +124,7 @@ void file_proccess(int argc, char** argv, flags flag_container, char** e_args, i
             fprintf(stderr, "File %s does not exists.\n", argv[i]);
             return;
         }
-        if (flag_container.s && !file) {
+        if (flag_container.s && !file) {        //если есть -s и файл не существует
             if (i++ != argc)
                 continue;
         }
@@ -90,16 +134,21 @@ void file_proccess(int argc, char** argv, flags flag_container, char** e_args, i
             int match = 0;
             char result[MAX_LINE_LENGTH] = {0};
             if (flag_container.e) {  // если есть -e
-                for (int k = 0; k < e_args_counter; k++) {
-                    if ((match = search_in_line(line, e_args[k], flag_container.i, result)) == 1) {
+                for (int k = 0; k < e_args_counter; k++)
+                    if ((match = search_in_line(line, e_args[k], flag_container.i, result)) == 1){
+                        strcpy(pattern, e_args[k]);  //копируем строку на случай -o
                         k = e_args_counter;
                     }
-                }
-                if (flag_container.v) match = !match;
-            } else {  // обычный поиск
+            } else{   // обычный поиск
                 match = search_in_line(line, argv[optind], flag_container.i, result);
-                if (flag_container.v) match = !match;
+                strcpy(pattern, argv[optind]);
             }
+            if (flag_container.o && match){
+                strcpy(line, pattern);
+                strcat(line, "\n");
+            }
+            if (flag_container.v) 
+                match = !match;
             if (match) {
                 count_matching_str++;
                 if (!flag_container.c && !flag_container.l)  // если нет -c и -l

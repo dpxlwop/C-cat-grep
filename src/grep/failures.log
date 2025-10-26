@@ -1,0 +1,128 @@
+FAIL
+Command: ./s21_grep -i -o -e 'hello' input.txt
+Expected: grep -i -o -e 'hello' input.txt
+---
+FAIL
+Command: ./s21_grep -i -o -e 'hello' input.txt input2.txt
+Expected: grep -i -o -e 'hello' input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -o -f patterns.txt input.txt
+Expected: grep -i -o -f patterns.txt input.txt
+---
+FAIL
+Command: ./s21_grep -i -o -f patterns.txt input.txt input2.txt
+Expected: grep -i -o -f patterns.txt input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -n -o -e 'hello' input.txt
+Expected: grep -i -n -o -e 'hello' input.txt
+---
+FAIL
+Command: ./s21_grep -i -n -o -e 'hello' input.txt input2.txt
+Expected: grep -i -n -o -e 'hello' input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -n -o -f patterns.txt input.txt
+Expected: grep -i -n -o -f patterns.txt input.txt
+---
+FAIL
+Command: ./s21_grep -i -n -o -f patterns.txt input.txt input2.txt
+Expected: grep -i -n -o -f patterns.txt input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -h -o -e 'hello' input.txt
+Expected: grep -i -h -o -e 'hello' input.txt
+---
+FAIL
+Command: ./s21_grep -i -h -o -e 'hello' input.txt input2.txt
+Expected: grep -i -h -o -e 'hello' input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -h -o -f patterns.txt input.txt
+Expected: grep -i -h -o -f patterns.txt input.txt
+---
+FAIL
+Command: ./s21_grep -i -h -o -f patterns.txt input.txt input2.txt
+Expected: grep -i -h -o -f patterns.txt input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -n -h -o -e 'hello' input.txt
+Expected: grep -i -n -h -o -e 'hello' input.txt
+---
+FAIL
+Command: ./s21_grep -i -n -h -o -e 'hello' input.txt input2.txt
+Expected: grep -i -n -h -o -e 'hello' input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -n -h -o -f patterns.txt input.txt
+Expected: grep -i -n -h -o -f patterns.txt input.txt
+---
+FAIL
+Command: ./s21_grep -i -n -h -o -f patterns.txt input.txt input2.txt
+Expected: grep -i -n -h -o -f patterns.txt input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -s -o -e 'hello' input.txt
+Expected: grep -i -s -o -e 'hello' input.txt
+---
+FAIL
+Command: ./s21_grep -i -s -o -e 'hello' input.txt input2.txt
+Expected: grep -i -s -o -e 'hello' input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -s -o -f patterns.txt input.txt
+Expected: grep -i -s -o -f patterns.txt input.txt
+---
+FAIL
+Command: ./s21_grep -i -s -o -f patterns.txt input.txt input2.txt
+Expected: grep -i -s -o -f patterns.txt input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -n -s -o -e 'hello' input.txt
+Expected: grep -i -n -s -o -e 'hello' input.txt
+---
+FAIL
+Command: ./s21_grep -i -n -s -o -e 'hello' input.txt input2.txt
+Expected: grep -i -n -s -o -e 'hello' input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -n -s -o -f patterns.txt input.txt
+Expected: grep -i -n -s -o -f patterns.txt input.txt
+---
+FAIL
+Command: ./s21_grep -i -n -s -o -f patterns.txt input.txt input2.txt
+Expected: grep -i -n -s -o -f patterns.txt input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -h -s -o -e 'hello' input.txt
+Expected: grep -i -h -s -o -e 'hello' input.txt
+---
+FAIL
+Command: ./s21_grep -i -h -s -o -e 'hello' input.txt input2.txt
+Expected: grep -i -h -s -o -e 'hello' input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -h -s -o -f patterns.txt input.txt
+Expected: grep -i -h -s -o -f patterns.txt input.txt
+---
+FAIL
+Command: ./s21_grep -i -h -s -o -f patterns.txt input.txt input2.txt
+Expected: grep -i -h -s -o -f patterns.txt input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -n -h -s -o -e 'hello' input.txt
+Expected: grep -i -n -h -s -o -e 'hello' input.txt
+---
+FAIL
+Command: ./s21_grep -i -n -h -s -o -e 'hello' input.txt input2.txt
+Expected: grep -i -n -h -s -o -e 'hello' input.txt input2.txt
+---
+FAIL
+Command: ./s21_grep -i -n -h -s -o -f patterns.txt input.txt
+Expected: grep -i -n -h -s -o -f patterns.txt input.txt
+---
+FAIL
+Command: ./s21_grep -i -n -h -s -o -f patterns.txt input.txt input2.txt
+Expected: grep -i -n -h -s -o -f patterns.txt input.txt input2.txt
+---

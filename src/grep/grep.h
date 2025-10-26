@@ -7,6 +7,8 @@ typedef struct {
   int n;
   int h;
   int s;
+  int f;
+  int o;
 } flags;
 void file_proccess(int argc, char** argv, flags flag_container, char** e_args,
                    int e_args_counter);
@@ -14,3 +16,4 @@ void output(char* line, char* filename, int filecounter, int line_number, int co
 int search_in_line(const char* line, const char* pattern, int ignore_case,
                    char* result);
 void free_mem(char** e_args, int e_args_counter);
+int get_arg_array(flags flag_container, char** e_args, int* e_args_counter, char** argv);
