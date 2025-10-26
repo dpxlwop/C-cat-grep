@@ -12,7 +12,7 @@
 int main(int argc, char** argv) {
     flags flag_container = {0};
     int e_args_counter = 0;
-    char** e_args = (char**)malloc(e_args_counter * sizeof(char*));
+    char** e_args = calloc(e_args_counter * sizeof(char*), 0);
     if (e_args == NULL) {
         return 1;
     }
@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
         return 1;
     }
     int rez;
-    while ((rez = getopt(argc, argv, "e:ivclnhsof:")) != -1) {
+    while ((rez = getopt(argc, argv, "e:ivclnhsf:")) != -1) {
         switch (rez) {
             case 'e':  // шаблон
                 flag_container.e = 1;
@@ -52,9 +52,6 @@ int main(int argc, char** argv) {
                 flag_container.f = optind+1;
                 flag_container.e = 1;   //для простой обработки
                 get_arg_array(flag_container, e_args, &e_args_counter, argv);
-                break;
-            case 'o':   //печатать только совпавшие слова
-                flag_container.o = 1;
                 break;
             case '?':
                 fprintf(stderr, "Unknown option '%c'\n", optopt);
@@ -143,10 +140,6 @@ void file_proccess(int argc, char** argv, flags flag_container, char** e_args, i
                 match = search_in_line(line, argv[optind], flag_container, result);
                 strcpy(pattern, argv[optind]);
             }
-            if (flag_container.o && match){
-                strcpy(line, pattern);
-                strcat(line, "\n");
-            }
             if (flag_container.v) 
                 match = !match;
             if (match) {
@@ -207,13 +200,5 @@ int search_in_line(const char* line, const char* pattern, flags flag_container, 
     } else {
         match = (strstr(line, pattern) != NULL);  // ищем строку с учетом регистра
     }
-    
-    if (flag_container.o){
-        int j  = 0, len = strlen(pattern);
-        for (char* i = strcasestr(line, pattern); j < len; j++){
-            result[j] = *i;
-            i++;}
-    } else
-        strcpy(result, line);  // копируем строку
     return match;
 }

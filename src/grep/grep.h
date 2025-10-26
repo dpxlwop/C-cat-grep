@@ -8,7 +8,6 @@ typedef struct {
   int h;
   int s;
   int f;
-  int o;
 } flags;
 void file_proccess(int argc, char** argv, flags flag_container, char** e_args,
                    int e_args_counter);
