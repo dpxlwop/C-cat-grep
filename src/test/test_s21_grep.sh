@@ -9,8 +9,10 @@ SYS_GREP="grep"
 
 INT="input.txt"
 INT2="input2.txt"
+PATTERN_FILE="patterns.txt"
 OUT1="output1.txt"
 OUT2="output2.txt"
+LOG_FILE="failures.log"
 
 passed=0
 failed=0
@@ -26,60 +28,93 @@ EOF
 
 cp "$INT" "$INT2"
 
-# Паттерн для поиска
-PATTERN="hello"
+# Файл с шаблонами для -f
+cat > "$PATTERN_FILE" << EOF
+hello
+test
+EOF
 
 run_test() {
-    local flags="$1"
-    local files="$2"
-    echo "Testing: $S21_GREP $flags -e '$PATTERN' $files ..."
+    local description="$1"
+    local cmd1="$2"
+    local cmd2="$3"
 
-    # Формируем команды
-    local cmd1="$S21_GREP $flags -e \"$PATTERN\" $files"
-    local cmd2="$SYS_GREP $flags -e \"$PATTERN\" $files"
+    echo "Testing: $description ..."
 
-    # Выполняем
+    # Выполняем команды
     eval "$cmd1" > "$OUT1" 2>/dev/null || true
     eval "$cmd2" > "$OUT2" 2>/dev/null || true
 
     # Сравниваем
-    if diff -q "$OUT1" "$OUT2" > /dev/null; then
+    if diff -q "$OUT1" "$OUT2"; then
         echo -e "${GREEN}OK${NC}"
         passed=$((passed + 1))
     else
         echo -e "${RED}FAIL${NC}"
-        echo "Различия:"
-        diff "$OUT1" "$OUT2"
         failed=$((failed + 1))
+        echo "FAIL" >> "$LOG_FILE"
+        echo "Command: $cmd1" >> "$LOG_FILE"
+        echo "Expected: $cmd2" >> "$LOG_FILE"
+        echo "Diff output:"  >> "$LOG_FILE"
+        diff "$OUT1" "$OUT2" >> "$LOG_FILE"
+        echo "---" >> "$LOG_FILE"
     fi
 }
 
-# Генерация всех комбинаций флагов из списка
-generate_all_combinations() {
-    local flags=("-e" "-i" "-v" "-c" "-l" "-n")
-    local n=${#flags[@]}
-    local total=$((1 << n))  # 2^6 = 64
+# Тесты с -e
+test_with_e() {
+    local flags="$1"
+    local files="$2"
+    local desc="$S21_GREP $flags -e 'hello' $files"
+    local cmd1="$S21_GREP $flags -e 'hello' $files"
+    local cmd2="$SYS_GREP $flags -e 'hello' $files"
+    run_test "$desc" "$cmd1" "$cmd2"
+}
+
+# Тесты с -f
+test_with_f() {
+    local flags="$1"
+    local files="$2"
+    local desc="$S21_GREP $flags -f $PATTERN_FILE $files"
+    local cmd1="$S21_GREP $flags -f $PATTERN_FILE $files"
+    local cmd2="$SYS_GREP $flags -f $PATTERN_FILE $files"
+    run_test "$desc" "$cmd1" "$cmd2"
+}
+
+# Генерация комбинаций флагов (без -e и -f, они добавляются отдельно)
+generate_flag_combinations() {
+    # Все флаги, кроме -e и -f (они управляют источником шаблона)
+    local base_flags=("-i" "-v" "-c" "-l" "-n" "-h" "-s")
+    local n=${#base_flags[@]}
+    local total=$((1 << n))
 
     for ((mask = 0; mask < total; mask++)); do
         local combo=""
         for ((j = 0; j < n; j++)); do
             if (( (mask >> j) & 1 )); then
-                combo+="${flags[j]} "
+                combo+="${base_flags[j]} "
             fi
         done
-        combo=$(echo "$combo" | sed 's/ $//')  # убрать завершающий пробел
+        combo=$(echo "$combo" | sed 's/ $//')
 
-        # Тестируем с одним и двумя файлами
-        run_test "$combo" "$INT"
-        run_test "$combo" "$INT $INT2"
+        # Тестируем с -e
+        test_with_e "$combo" "$INT"
+        test_with_e "$combo" "$INT $INT2"
+
+        # Тестируем с -f
+        test_with_f "$combo" "$INT"
+        test_with_f "$combo" "$INT $INT2"
     done
 }
 
-# Запуск всех тестов
-generate_all_combinations
+# Очистка лога
+> "$LOG_FILE"
 
-# Очистка
-rm -f "$INT" "$INT2" "$OUT1" "$OUT2"
+# Запуск тестов
+generate_flag_combinations
+
+# Очистка временных файлов
+rm -f "$INT" "$INT2" "$PATTERN_FILE" "$OUT1" "$OUT2"
 
 # Итог
 echo -e "\nПройдено: ${GREEN}$passed${NC}"
@@ -88,5 +123,6 @@ echo -e "Провалено: ${RED}$failed${NC}\n"
 if [ "$failed" -eq 0 ]; then
     exit 0
 else
+    echo "Подробности в $LOG_FILE"
     exit 1
 fi
