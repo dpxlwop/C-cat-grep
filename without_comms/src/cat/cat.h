@@ -7,6 +7,6 @@ typedef struct {
   int v;
 } flags;
 
-int file_proccess(const char* filename, flags flag_container);
-void replace_symbols(char* string, int flag_v, int flag_t);
+int file_proccess(const char *filename, flags flag_container);
+void replace_symbols(char *string, int flag_v, int flag_t);
 void print_visible_char(unsigned char c);

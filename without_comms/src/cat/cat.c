@@ -11,7 +11,7 @@ struct option long_options[] = {{"number-nonblank", no_argument, 0, 'b'},
                                 {"squeeze-blank", no_argument, 0, 's'},
                                 {0, 0, 0, 0}};
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   flags flag_container = {0};
   if (argc < 2) {
     fprintf(stderr, "Usage: %s <options> <file1> [file2] ...\n", argv[0]);
@@ -56,8 +56,8 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-int file_proccess(const char* filename, flags flag_container) {
-  FILE* file = fopen(filename, "r");
+int file_proccess(const char *filename, flags flag_container) {
+  FILE *file = fopen(filename, "r");
   if (!file) {
     fprintf(stderr, "File %s does not exists.\n", filename);
     return 1;
@@ -90,8 +90,8 @@ int file_proccess(const char* filename, flags flag_container) {
   return 0;
 }
 
-void replace_symbols(char* string, int flag_v, int flag_t) {
-  for (unsigned char* p = (unsigned char*)string; *p != '\n'; p++) {
+void replace_symbols(char *string, int flag_v, int flag_t) {
+  for (unsigned char *p = (unsigned char *)string; *p != '\n'; p++) {
     if (*p == '\t' && flag_t)
       printf("^I");
     else if (flag_v)
@@ -106,7 +106,7 @@ void print_visible_char(unsigned char c) {
     putchar(c);
   else if (c == 9 || c == 10)  // таб или \n — обычные
     putchar(c);
-  else if (c < 32)          // управляющие символы типо \0 EOF и тд
+  else if (c < 32)  // управляющие символы типо \0 EOF и тд
     printf("^%c", c + 64);  // ^A–^Z
   else if (c == 127)
     printf("^?");
