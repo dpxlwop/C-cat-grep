@@ -102,15 +102,15 @@ void replace_symbols(char *string, int flag_v, int flag_t) {
 }
 
 void print_visible_char(unsigned char c) {
-  if (c >= 32 && c < 127)  // обычные символы
+  if (c >= 32 && c < 127)
     putchar(c);
-  else if (c == 9 || c == 10)  // таб или \n — обычные
+  else if (c == 9 || c == 10)
     putchar(c);
-  else if (c < 32)  // управляющие символы типо \0 EOF и тд
-    printf("^%c", c + 64);  // ^A–^Z
+  else if (c < 32)
+    printf("^%c", c + 64);
   else if (c == 127)
     printf("^?");
-  else {  // обработка не ascii символов
+  else {
     printf("M-");
     if (c >= 160)
       putchar(c - 128);
