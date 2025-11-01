@@ -71,6 +71,7 @@ int get_arg_array(flags flag_container, char** e_args, int* e_args_counter,
     FILE* file = fopen(optarg, "r");
     if (!file && !flag_container.s) {
       fprintf(stderr, "File %s does not exists.\n", argv[flag_container.f]);
+      fclose(file);
       return 1;
     }
     while (fgets(line, sizeof(line), file) != NULL) {
@@ -78,6 +79,7 @@ int get_arg_array(flags flag_container, char** e_args, int* e_args_counter,
       if (e_args == NULL) {
         free_mem(e_args, *e_args_counter);
         printf("Error allocating memory\n");
+        fclose(file);
         return 1;
       }
       e_args[*e_args_counter] =
@@ -85,6 +87,7 @@ int get_arg_array(flags flag_container, char** e_args, int* e_args_counter,
       if (e_args[*e_args_counter] == NULL) {
         printf("Error allocating memory\n");
         free_mem(e_args, *e_args_counter);
+        fclose(file);
         return 1;
       }
       line[strcspn(line, "\n")] = '\0';
