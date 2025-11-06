@@ -1,7 +1,7 @@
 #!/bin/bash
 
 GREEN='\033[0;32m'
-RED='\033[0;31m'  # Исправлено: было '\033[0;31m', но NC ниже — лучше использовать RED правильно
+RED='\033[0;31m'  
 NC='\033[0m'
 
 S21_CAT="./s21_cat"
@@ -14,24 +14,19 @@ OUT2="output2.txt"
 passed=0
 failed=0
 
-# Входные данные с различными спецсимволами
 TEST_CONTENT=$'\nHello\tworld\t\n\t\t\n\n\ntest test\t\nbye\x01\x0212345\x08\x08\x08678\x04\x1b\x7fInvisible chars test\x05END'
 
 run_test() {
     local flags="$1"
     echo "$TEST_CONTENT" > "$INT"
     local cmd="$S21_CAT $flags $INT"
-    echo "Testing: $cmd ... "
-
-    # Заменяем './s21_cat' на 'cat'
+    echo "TXT Testing: $cmd ... "
     local sys_cmd="${cmd#./}"
     sys_cmd="${sys_cmd/s21_cat/cat}"
-
-    # Выполняем обе команды
+    
     eval "$cmd" > "$OUT1" 2>/dev/null || true
     eval "$sys_cmd" > "$OUT2" 2>/dev/null || true
 
-    # Сравниваем вывод
     if diff -q "$OUT1" "$OUT2" > /dev/null; then
         echo -e "${GREEN}OK${NC}"
         passed=$((passed + 1))
@@ -41,7 +36,7 @@ run_test() {
     fi
 }
 
-# Генерация всех комбинаций флагов из списка
+
 generate_combinations() {
     local flags=("-b" "-e" "-n" "-s" "-t" "-v")
     local n=${#flags[@]}
@@ -54,7 +49,6 @@ generate_combinations() {
                 combo+="${flags[j]} "
             fi
         done
-        # Убираем лишний пробел в конце и передаём в run_test
         combo=$(echo "$combo" | sed 's/ $//')
         if [ -z "$combo" ]; then
             run_test ""
@@ -64,13 +58,10 @@ generate_combinations() {
     done
 }
 
-# Запуск всех комбинаций
 generate_combinations
 
-# Очистка
 rm -f "$INT" "$OUT1" "$OUT2"
 
-# Итог
 echo -e "\nПройдено: ${GREEN}$passed${NC}"
 echo -e "Провалено: ${RED}$failed${NC}\n"
 

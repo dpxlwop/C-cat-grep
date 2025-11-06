@@ -17,7 +17,6 @@ LOG_FILE="failures.log"
 passed=0
 failed=0
 
-# Подготовка входных файлов
 cat > "$INT" << EOF
 Hello World
 hello world
@@ -27,8 +26,6 @@ End of file.
 EOF
 
 cp "$INT" "$INT2"
-
-# Файл с шаблонами для -f
 cat > "$PATTERN_FILE" << EOF
 hello
 test
@@ -41,11 +38,9 @@ run_test() {
 
     echo "Testing: $description ..."
 
-    # Выполняем команды
     eval "$cmd1" > "$OUT1" 2>/dev/null || true
     eval "$cmd2" > "$OUT2" 2>/dev/null || true
 
-    # Сравниваем
     if diff -q "$OUT1" "$OUT2"; then
         echo -e "${GREEN}OK${NC}"
         passed=$((passed + 1))
@@ -61,7 +56,6 @@ run_test() {
     fi
 }
 
-# Тесты с -e
 test_with_e() {
     local flags="$1"
     local files="$2"
@@ -71,7 +65,6 @@ test_with_e() {
     run_test "$desc" "$cmd1" "$cmd2"
 }
 
-# Тесты с -f
 test_with_f() {
     local flags="$1"
     local files="$2"
@@ -81,9 +74,7 @@ test_with_f() {
     run_test "$desc" "$cmd1" "$cmd2"
 }
 
-# Генерация комбинаций флагов (без -e и -f, они добавляются отдельно)
 generate_flag_combinations() {
-    # Все флаги, кроме -e и -f (они управляют источником шаблона)
     local base_flags=("-i" "-v" "-c" "-l" "-n" "-h" "-s")
     local n=${#base_flags[@]}
     local total=$((1 << n))
@@ -97,26 +88,20 @@ generate_flag_combinations() {
         done
         combo=$(echo "$combo" | sed 's/ $//')
 
-        # Тестируем с -e
         test_with_e "$combo" "$INT"
         test_with_e "$combo" "$INT $INT2"
 
-        # Тестируем с -f
         test_with_f "$combo" "$INT"
         test_with_f "$combo" "$INT $INT2"
     done
 }
 
-# Очистка лога
 > "$LOG_FILE"
 
-# Запуск тестов
 generate_flag_combinations
 
-# Очистка временных файлов
 rm -f "$INT" "$INT2" "$PATTERN_FILE" "$OUT1" "$OUT2"
 
-# Итог
 echo -e "\nПройдено: ${GREEN}$passed${NC}"
 echo -e "Провалено: ${RED}$failed${NC}\n"
 
