@@ -1,2 +1,2 @@
 # C-cat-grep
-Implementing cat & grep using C
+Implementing cat & grep using C language
